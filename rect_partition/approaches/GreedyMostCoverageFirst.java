@@ -32,7 +32,7 @@ public class GreedyMostCoverageFirst extends Approach {
                 throw new PartitionProblemException("Unable to find a solution for this instance");
             }
 
-            this.statesExpanded++;
+            this.statesExpanded += neighbours.size();
 
             State candidate = neighbours.get(0);
 

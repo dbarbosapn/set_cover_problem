@@ -103,7 +103,7 @@ public class PartitionProblem {
         try {
             int answer = approach.solve();
 
-            // Utils.clearWindow(headerText);
+            Utils.clearWindow(headerText);
 
             System.out.println("Number of vertexes in solution: " + answer);
             System.out.println("Number of states expanded: " + approach.getStatesExpanded());
