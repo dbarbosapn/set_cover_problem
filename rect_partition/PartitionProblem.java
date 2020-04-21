@@ -200,7 +200,6 @@ public class PartitionProblem {
             rectanglesToCover.add(file.nextInt());
         }
 
-        System.out.println(rectanglesToCover);
     }
 
 }
