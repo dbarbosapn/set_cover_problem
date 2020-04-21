@@ -26,7 +26,7 @@ public abstract class Approach {
     public Approach(int totalRectangles, Collection<Vert> verts) {
         this.totalRectangles = totalRectangles;
         currentState = new State(totalRectangles, verts);
-        statesExpanded = 0;
+        statesExpanded = 1;
     }
 
     /**

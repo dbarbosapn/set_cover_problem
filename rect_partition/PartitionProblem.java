@@ -13,12 +13,13 @@ import java.util.Scanner;
 import rect_partition.utils.Utils;
 
 import rect_partition.approaches.Approach;
+import rect_partition.approaches.BFS;
 import rect_partition.approaches.GreedyMostCoverageFirst;
 
 public class PartitionProblem {
 
-    private static final int NUM_APPROACHES = 1;
-    private static final String headerText = "Welcome to the Partition Problem.\nThis software was design and developed by Diogo Barbosa.\n";
+    private static final int NUM_APPROACHES = 2;
+    private static final String headerText = "Welcome to the Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
     private static int selectedApproach;
 
     public static void main(String[] args) {
@@ -29,6 +30,7 @@ public class PartitionProblem {
         System.out.println("Choose an approach by entering the corresponding number: ");
         // Approaches
         System.out.println("1: Greedy - Vertex that covers the most triangles first");
+        System.out.println("2: BFS");
 
         int chosen = stdin.nextInt();
         Utils.clearWindow(headerText);
@@ -41,7 +43,7 @@ public class PartitionProblem {
 
         selectedApproach = chosen;
 
-        System.out.print("Insert the file path (must be absolute path): ");
+        System.out.print("Insert the file path: ");
 
         String filePath = stdin.next();
         Scanner file;
@@ -146,6 +148,8 @@ public class PartitionProblem {
         switch (selectedApproach) {
             case 1:
                 return new GreedyMostCoverageFirst(rectangles, verts);
+            case 2:
+                return new BFS(rectangles, verts);
         }
 
         return null;

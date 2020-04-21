@@ -107,4 +107,22 @@ public class State {
                 + vertsLeft + "\n" + "Covered Rectangles: " + coveredRectangles + "\n";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof State))
+            return false;
+
+        if (o == this)
+            return true;
+
+        State s = (State) o;
+
+        return s.totalRectangles == this.totalRectangles && s.chosenVerts.equals(this.chosenVerts)
+                && s.vertsLeft.equals(this.vertsLeft) && s.coveredRectangles.equals(this.coveredRectangles);
+    }
+
+    @Override
+    public int hashCode() {
+        return totalRectangles * chosenVerts.hashCode() * vertsLeft.hashCode() * coveredRectangles.hashCode();
+    }
 }
