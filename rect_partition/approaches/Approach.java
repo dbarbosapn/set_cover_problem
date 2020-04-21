@@ -14,7 +14,7 @@ import rect_partition.utils.PartitionProblemException;
 public abstract class Approach {
 
     protected int totalRectangles;
-    protected int statesVisited;
+    protected int statesExpanded;
     protected State currentState;
 
     /**
@@ -26,7 +26,7 @@ public abstract class Approach {
     public Approach(int totalRectangles, Collection<Vert> verts) {
         this.totalRectangles = totalRectangles;
         currentState = new State(totalRectangles, verts);
-        statesVisited = 0;
+        statesExpanded = 0;
     }
 
     /**
@@ -36,8 +36,8 @@ public abstract class Approach {
      */
     public abstract int solve() throws PartitionProblemException;
 
-    public int getStatesVisited() {
-        return statesVisited;
+    public int getStatesExpanded() {
+        return statesExpanded;
     }
 
     public Set<Vert> getChosenVerts() {

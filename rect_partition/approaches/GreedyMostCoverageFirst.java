@@ -1,7 +1,9 @@
 package rect_partition.approaches;
 
 import java.util.Collection;
+import java.util.List;
 
+import rect_partition.State;
 import rect_partition.Vert;
 import rect_partition.utils.PartitionProblemException;
 
@@ -15,24 +17,33 @@ public class GreedyMostCoverageFirst extends Approach {
         super(totalRectangles, verts);
     }
 
+    /**
+     * In this specific implementation, we get all the neighbours from a state, and
+     * choose the one with most rectangles covered, until we get to a final state.
+     */
     @Override
     public int solve() throws PartitionProblemException {
 
         while (!currentState.isFinal()) {
-            this.statesVisited++;
 
-            Vert chosen = null;
+            List<State> neighbours = currentState.expand();
 
-            // Select the vertex that covers more rectangles
-            for (Vert v : currentState.getVertsLeft()) {
-                if (chosen == null) {
-                    chosen = v;
-                } else if (v.getRectangles().size() > chosen.getRectangles().size()) {
-                    chosen = v;
+            if (neighbours.size() == 0) {
+                throw new PartitionProblemException("Unable to find a solution for this instance");
+            }
+
+            this.statesExpanded++;
+
+            State candidate = neighbours.get(0);
+
+            for (State neighbour : neighbours) {
+                if (neighbour.getCoveredRectangles().size() > candidate.getCoveredRectangles().size()) {
+                    candidate = neighbour;
                 }
             }
 
-            currentState = currentState.chooseVert(chosen);
+            currentState = candidate;
+
         }
 
         return currentState.getChosenVerts().size();

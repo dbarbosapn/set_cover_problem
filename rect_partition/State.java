@@ -1,7 +1,9 @@
 package rect_partition;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import rect_partition.utils.PartitionProblemException;
@@ -53,55 +55,56 @@ public class State {
     }
 
     /**
-     * Checks the rectangles being covered in this state by going through all the
-     * chosen verts. Being N = chosenVerts.size() and M = totalRectangles, the
-     * complexity of this function is O(N * M)
-     * 
-     * @return the number of rectangles covered
-     */
-    public Set<Integer> rectanglesCovered() {
-        Set<Integer> set = new HashSet<>();
-        for (Vert v : chosenVerts) {
-            for (int c : v.getRectangles()) {
-                set.add(c);
-            }
-        }
-
-        return set;
-    }
-
-    /**
      * Checks if this is a final state by comparing the number of rectangles covered
      * to the total number of rectangles
      * 
      * @return true if the state is final; false otherwise
      */
     public boolean isFinal() {
-        return rectanglesCovered().size() == totalRectangles;
+        return coveredRectangles.size() == totalRectangles;
     }
 
     /**
-     * Clones the current state and chooses a vertex in "vertsLeft".
+     * Expands this state by getting all the vertex choices. Therefore, this is a
+     * O(V) operation.
      * 
-     * @param v - the vert to clone
-     * @return the new state
+     * @return the list of neighbour states
      * @throws PartitionProblemException
      */
-    public State chooseVert(Vert v) throws PartitionProblemException {
-        if (!vertsLeft.contains(v)) {
-            throw new PartitionProblemException("To choose a vert, that vert should be valid and unchosen");
+    public List<State> expand() throws PartitionProblemException {
+        List<State> neighbours = new ArrayList<>(vertsLeft.size());
+
+        for (Vert v : vertsLeft) {
+            neighbours.add(chooseVert(v));
         }
 
-        State clone = new State(this);
-        clone.getVertsLeft().remove(v);
-        clone.getChosenVerts().add(v);
-        clone.getCoveredRectangles().addAll(v.getRectangles());
+        return neighbours;
+    }
 
-        for (Vert vert : clone.getVertsLeft()) {
-            vert.getRectangles().removeAll(clone.getCoveredRectangles());
+    /**
+     * Gets the resulting state of choosing another vert
+     * 
+     * @param v - the vert to choose
+     * @return the resulting state
+     */
+    private State chooseVert(Vert v) throws PartitionProblemException {
+        State clone = new State(this);
+
+        if (!clone.vertsLeft.contains(v)) {
+            throw new PartitionProblemException("Chosen vertex must be in the available vertexes");
+        } else {
+            clone.vertsLeft.remove(v);
+            clone.chosenVerts.add(v);
+            clone.coveredRectangles.addAll(v.getRectangles());
         }
 
         return clone;
+    }
+
+    @Override
+    public String toString() {
+        return "Total Rectangles: " + totalRectangles + "\n" + "Chosen Verts: " + chosenVerts + "\n" + "Verts Left: "
+                + vertsLeft + "\n" + "Covered Rectangles: " + coveredRectangles + "\n";
     }
 
 }

@@ -104,8 +104,9 @@ public class PartitionProblem {
             int answer = approach.solve();
 
             // Utils.clearWindow(headerText);
+
             System.out.println("Number of vertexes in solution: " + answer);
-            System.out.println("Number of states visited: " + approach.getStatesVisited());
+            System.out.println("Number of states expanded: " + approach.getStatesExpanded());
             System.out.println();
             System.out.print("Do you want to get an output of the vertexes chosen? (Y/N): ");
 
