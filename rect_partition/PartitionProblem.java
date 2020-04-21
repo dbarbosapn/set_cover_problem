@@ -14,11 +14,12 @@ import rect_partition.utils.Utils;
 
 import rect_partition.approaches.Approach;
 import rect_partition.approaches.BFS;
+import rect_partition.approaches.DFS;
 import rect_partition.approaches.GreedyMostCoverageFirst;
 
 public class PartitionProblem {
 
-    private static final int NUM_APPROACHES = 2;
+    private static final int NUM_APPROACHES = 3;
     private static final String headerText = "Welcome to the Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
     private static int selectedApproach;
 
@@ -31,6 +32,8 @@ public class PartitionProblem {
         // Approaches
         System.out.println("1: Greedy - Vertex that covers the most triangles first");
         System.out.println("2: BFS");
+        System.out.println("3: DFS");
+        System.out.println();
 
         int chosen = stdin.nextInt();
         Utils.clearWindow(headerText);
@@ -150,6 +153,8 @@ public class PartitionProblem {
                 return new GreedyMostCoverageFirst(rectangles, verts);
             case 2:
                 return new BFS(rectangles, verts);
+            case 3:
+                return new DFS(rectangles, verts);
         }
 
         return null;
