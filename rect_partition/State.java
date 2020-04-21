@@ -10,20 +10,20 @@ import rect_partition.utils.PartitionProblemException;
 
 public class State {
 
-    private int totalRectangles;
     private Set<Vert> chosenVerts = new HashSet<>();
     private Set<Vert> vertsLeft = new HashSet<>();
-    private Set<Integer> coveredRectangles = new HashSet<>();
+    private Set<Integer> rectanglesLeft = new HashSet<>();
+    private Set<Integer> rectanglesCovered = new HashSet<>();
 
     /**
      * Constructor for an empty state
      * 
-     * @param totalRectangles in the state
-     * @param verts           to be chosen
+     * @param verts             to be chosen
+     * @param rectanglesToCover the rectangles to be covered
      */
-    public State(int totalRectangles, Collection<Vert> verts) {
-        this.totalRectangles = totalRectangles;
+    public State(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
         this.vertsLeft = new HashSet<>(verts);
+        this.rectanglesLeft = new HashSet<>(rectanglesToCover);
     }
 
     /**
@@ -32,26 +32,26 @@ public class State {
      * @param s - the state to clone
      */
     public State(State s) {
-        this.totalRectangles = s.getTotalRectangles();
         this.chosenVerts = new HashSet<>(s.getChosenVerts());
         this.vertsLeft = new HashSet<>(s.getVertsLeft());
-        this.coveredRectangles = new HashSet<>(s.getCoveredRectangles());
+        this.rectanglesLeft = new HashSet<>(s.getRectanglesLeft());
+        this.rectanglesCovered = new HashSet<>(s.rectanglesCovered);
     }
 
     public Set<Vert> getVertsLeft() {
         return vertsLeft;
     }
 
-    public int getTotalRectangles() {
-        return totalRectangles;
-    }
-
     public Set<Vert> getChosenVerts() {
         return chosenVerts;
     }
 
-    public Set<Integer> getCoveredRectangles() {
-        return coveredRectangles;
+    public Set<Integer> getRectanglesLeft() {
+        return rectanglesLeft;
+    }
+
+    public Set<Integer> getRectanglesCovered() {
+        return rectanglesCovered;
     }
 
     /**
@@ -61,7 +61,7 @@ public class State {
      * @return true if the state is final; false otherwise
      */
     public boolean isFinal() {
-        return coveredRectangles.size() == totalRectangles;
+        return rectanglesLeft.isEmpty();
     }
 
     /**
@@ -95,7 +95,8 @@ public class State {
         } else {
             clone.vertsLeft.remove(v);
             clone.chosenVerts.add(v);
-            clone.coveredRectangles.addAll(v.getRectangles());
+            clone.rectanglesLeft.removeAll(v.getRectangles());
+            clone.rectanglesCovered.addAll(v.getRectangles());
         }
 
         return clone;
@@ -103,8 +104,8 @@ public class State {
 
     @Override
     public String toString() {
-        return "Total Rectangles: " + totalRectangles + "\n" + "Chosen Verts: " + chosenVerts + "\n" + "Verts Left: "
-                + vertsLeft + "\n" + "Covered Rectangles: " + coveredRectangles + "\n";
+        return "Rectangles Left To Be Covered: " + rectanglesLeft + "\n" + "Chosen Verts: " + chosenVerts + "\n"
+                + "Verts Left: " + vertsLeft + "\n" + "Covered Rectangles: " + rectanglesCovered + "\n";
     }
 
     @Override
@@ -117,12 +118,12 @@ public class State {
 
         State s = (State) o;
 
-        return s.totalRectangles == this.totalRectangles && s.chosenVerts.equals(this.chosenVerts)
-                && s.vertsLeft.equals(this.vertsLeft) && s.coveredRectangles.equals(this.coveredRectangles);
+        return s.rectanglesLeft.equals(this.rectanglesLeft) && s.chosenVerts.equals(this.chosenVerts)
+                && s.vertsLeft.equals(this.vertsLeft) && s.rectanglesCovered.equals(this.rectanglesCovered);
     }
 
     @Override
     public int hashCode() {
-        return totalRectangles * chosenVerts.hashCode() * vertsLeft.hashCode() * coveredRectangles.hashCode();
+        return rectanglesLeft.hashCode() * chosenVerts.hashCode() * vertsLeft.hashCode() * rectanglesCovered.hashCode();
     }
 }

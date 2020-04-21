@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import rect_partition.utils.Utils;
 
@@ -100,10 +102,11 @@ public class PartitionProblem {
     private static void solveSet(Scanner file, Scanner stdin, int setNumber) {
         int rectangles = file.nextInt();
         Map<Integer, Vert> vertMap = new HashMap<>();
+        Set<Integer> rectanglesToCover = new HashSet<>();
 
-        readSetData(rectangles, vertMap, file);
+        readSetData(rectangles, rectanglesToCover, vertMap, file);
 
-        Approach approach = chooseApproach(rectangles, vertMap.values());
+        Approach approach = chooseApproach(vertMap.values(), rectanglesToCover);
 
         try {
             int answer = approach.solve();
@@ -143,18 +146,18 @@ public class PartitionProblem {
     /**
      * Returns an instance of the approach chosen
      * 
-     * @param rectangles - number of rectangles in the set
-     * @param verts      - all the verts in the set
+     * @param verts             all the verts in the set
+     * @param rectanglesToCover the rectangles to be covered
      * @return the approach
      */
-    private static Approach chooseApproach(int rectangles, Collection<Vert> verts) {
+    private static Approach chooseApproach(Collection<Vert> verts, Set<Integer> rectanglesToCover) {
         switch (selectedApproach) {
             case 1:
-                return new GreedyMostCoverageFirst(rectangles, verts);
+                return new GreedyMostCoverageFirst(verts, rectanglesToCover);
             case 2:
-                return new BFS(rectangles, verts);
+                return new BFS(verts, rectanglesToCover);
             case 3:
-                return new DFS(rectangles, verts);
+                return new DFS(verts, rectanglesToCover);
         }
 
         return null;
@@ -167,7 +170,8 @@ public class PartitionProblem {
      * @param vertMap    - the map containing the vertexes
      * @param file       - the file scanner
      */
-    private static void readSetData(int rectangles, Map<Integer, Vert> vertMap, Scanner file) {
+    private static void readSetData(int rectangles, Set<Integer> rectanglesToCover, Map<Integer, Vert> vertMap,
+            Scanner file) {
         // Read the rectangles
         for (int i = 0; i < rectangles; i++) {
             int currentRect = file.nextInt();
@@ -190,6 +194,13 @@ public class PartitionProblem {
                 v.getRectangles().add(currentRect);
             }
         }
+
+        int r = file.nextInt();
+        for (int i = 0; i < r; i++) {
+            rectanglesToCover.add(file.nextInt());
+        }
+
+        System.out.println(rectanglesToCover);
     }
 
 }

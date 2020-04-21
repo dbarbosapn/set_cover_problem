@@ -13,19 +13,18 @@ import rect_partition.utils.PartitionProblemException;
  */
 public abstract class Approach {
 
-    protected int totalRectangles;
     protected int statesExpanded;
     protected State currentState;
 
     /**
      * Public constructor
      * 
-     * @param totalRectangles in the problem set
-     * @param verts           in the problem set
+     * @param totalRectangles   in the problem set
+     * @param verts             in the problem set
+     * @param rectanglesToCover
      */
-    public Approach(int totalRectangles, Collection<Vert> verts) {
-        this.totalRectangles = totalRectangles;
-        currentState = new State(totalRectangles, verts);
+    public Approach(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
+        currentState = new State(verts, rectanglesToCover);
         statesExpanded = 1;
     }
 

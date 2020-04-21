@@ -13,8 +13,8 @@ import rect_partition.utils.PartitionProblemException;
  */
 public class GreedyMostCoverageFirst extends Approach {
 
-    public GreedyMostCoverageFirst(int totalRectangles, Collection<Vert> verts) {
-        super(totalRectangles, verts);
+    public GreedyMostCoverageFirst(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
+        super(verts, rectanglesToCover);
     }
 
     /**
@@ -37,7 +37,7 @@ public class GreedyMostCoverageFirst extends Approach {
             State candidate = neighbours.get(0);
 
             for (State neighbour : neighbours) {
-                if (neighbour.getCoveredRectangles().size() > candidate.getCoveredRectangles().size()) {
+                if (neighbour.getRectanglesLeft().size() < candidate.getRectanglesLeft().size()) {
                     candidate = neighbour;
                 }
             }

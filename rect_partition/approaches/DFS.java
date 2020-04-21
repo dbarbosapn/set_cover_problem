@@ -19,8 +19,8 @@ public class DFS extends Approach {
     // We save the visited states to prevent cycles in the search
     Set<State> visited = new HashSet<>();
 
-    public DFS(int totalRectangles, Collection<Vert> verts) {
-        super(totalRectangles, verts);
+    public DFS(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
+        super(verts, rectanglesToCover);
     }
 
     @Override
