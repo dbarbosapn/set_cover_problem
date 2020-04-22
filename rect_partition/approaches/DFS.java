@@ -19,8 +19,14 @@ public class DFS extends Approach {
     // We save the visited states to prevent cycles in the search
     Set<State> visited = new HashSet<>();
 
-    public DFS(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
+    int numRectanglesToCover;
+
+    boolean firstSolution;
+
+    public DFS(Collection<Vert> verts, Collection<Integer> rectanglesToCover, boolean firstSolution) {
         super(verts, rectanglesToCover);
+        this.numRectanglesToCover = rectanglesToCover.size();
+        this.firstSolution = firstSolution;
     }
 
     @Override
@@ -38,8 +44,21 @@ public class DFS extends Approach {
 
                 for (State n : neighbours) {
                     if (n.isFinal()) {
-                        currentState = n;
-                        return currentState.getChosenVerts().size();
+                        if (firstSolution) {
+                            this.currentState = n;
+                            return currentState.getChosenVerts().size();
+                        } else if (!currentState.isFinal()
+                                || currentState.getChosenVerts().size() < currentState.getChosenVerts().size()) {
+
+                            this.currentState = n;
+
+                            // It is possible to prove that the solution will not be better than
+                            // Math.ceil(numRectanglesToCover / 3); therefore, we will use this as a breaker
+
+                            if (currentState.getChosenVerts().size() <= Math.ceil((double) numRectanglesToCover / 3d)) {
+                                return currentState.getChosenVerts().size();
+                            }
+                        }
                     }
                     stack.push(n);
                 }

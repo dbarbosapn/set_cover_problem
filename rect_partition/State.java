@@ -35,7 +35,7 @@ public class State {
         this.chosenVerts = new HashSet<>(s.getChosenVerts());
         this.vertsLeft = new HashSet<>(s.getVertsLeft());
         this.rectanglesLeft = new HashSet<>(s.getRectanglesLeft());
-        this.rectanglesCovered = new HashSet<>(s.rectanglesCovered);
+        this.rectanglesCovered = new HashSet<>(s.getRectanglesCovered());
     }
 
     public Set<Vert> getVertsLeft() {

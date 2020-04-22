@@ -17,12 +17,13 @@ import rect_partition.utils.Utils;
 import rect_partition.approaches.Approach;
 import rect_partition.approaches.BFS;
 import rect_partition.approaches.DFS;
+import rect_partition.approaches.GreedyHardestRectanglesFirst;
 import rect_partition.approaches.GreedyMostCoverageFirst;
 
 public class PartitionProblem {
 
-    private static final int NUM_APPROACHES = 3;
-    private static final String headerText = "Welcome to the Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
+    private static final int NUM_APPROACHES = 6;
+    private static final String headerText = "Welcome to the Rectangle Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
     private static int selectedApproach;
 
     public static void main(String[] args) {
@@ -32,9 +33,12 @@ public class PartitionProblem {
 
         System.out.println("Choose an approach by entering the corresponding number: ");
         // Approaches
-        System.out.println("1: Greedy - Vertex that covers the most triangles first");
-        System.out.println("2: BFS");
-        System.out.println("3: DFS");
+        System.out.println("1: Greedy - State that has less rectangles left to cover first");
+        System.out.println("2: Greedy - State that has the hardest rectangle covered first");
+        System.out.println("3: BFS (Stop in the first solution)");
+        System.out.println("4: BFS (Find the best solution)");
+        System.out.println("5: DFS (Stop in the first solution)");
+        System.out.println("6: DFS (Find the best solution)");
         System.out.println();
 
         int chosen = stdin.nextInt();
@@ -155,9 +159,15 @@ public class PartitionProblem {
             case 1:
                 return new GreedyMostCoverageFirst(verts, rectanglesToCover);
             case 2:
-                return new BFS(verts, rectanglesToCover);
+                return new GreedyHardestRectanglesFirst(verts, rectanglesToCover);
             case 3:
-                return new DFS(verts, rectanglesToCover);
+                return new BFS(verts, rectanglesToCover, true);
+            case 4:
+                return new BFS(verts, rectanglesToCover, false);
+            case 5:
+                return new DFS(verts, rectanglesToCover, true);
+            case 6:
+                return new DFS(verts, rectanglesToCover, false);
         }
 
         return null;
