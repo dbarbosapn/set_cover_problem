@@ -19,10 +19,11 @@ import rect_partition.approaches.BFS;
 import rect_partition.approaches.DFS;
 import rect_partition.approaches.GreedyHardestRectanglesFirst;
 import rect_partition.approaches.GreedyMostCoverageFirst;
+import rect_partition.approaches.IDFS;
 
 public class PartitionProblem {
 
-    private static final int NUM_APPROACHES = 6;
+    private static final int NUM_APPROACHES = 7;
     private static final String headerText = "Welcome to the Rectangle Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
     private static int selectedApproach;
 
@@ -35,11 +36,11 @@ public class PartitionProblem {
         // Approaches
         System.out.println("1: Greedy - State that has less rectangles left to cover first");
         System.out.println("2: Greedy - State that has the hardest rectangle covered first");
-        System.out.println("3: BFS (Stop in the first solution)");
+        System.out.println("3: BFS (Stop at the first solution)");
         System.out.println("4: BFS (Find the best solution)");
-        System.out.println("5: DFS (Stop in the first solution)");
+        System.out.println("5: DFS (Stop at the first solution)");
         System.out.println("6: DFS (Find the best solution)");
-        System.out.println();
+        System.out.println("7: IDS (Stop at the first solution)");
 
         int chosen = stdin.nextInt();
         Utils.clearWindow(headerText);
@@ -168,6 +169,8 @@ public class PartitionProblem {
                 return new DFS(verts, rectanglesToCover, true);
             case 6:
                 return new DFS(verts, rectanglesToCover, false);
+            case 7:
+                return new IDFS(verts, rectanglesToCover);
         }
 
         return null;
