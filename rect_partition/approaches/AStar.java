@@ -11,8 +11,11 @@ import rect_partition.Vert;
 import rect_partition.utils.PartitionProblemException;
 
 /**
- * This approach relies on choosing the child states according to an heuristic
- * that predicts how far that state is from the solution.
+ * This approach is similar to the branch-and-bound but instead of always
+ * expanding the smallest cost, this one relies on choosing the child states
+ * according to it's cost plus an heuristic that predicts how far that state is
+ * from the solution. Also, we stop expanding states if their cost is worse than
+ * the best solution we've got so far.
  */
 public class AStar extends Approach {
 
