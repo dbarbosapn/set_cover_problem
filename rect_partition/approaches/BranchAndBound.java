@@ -11,18 +11,17 @@ import rect_partition.Vert;
 import rect_partition.utils.PartitionProblemException;
 
 /**
- * This approach is similar to the branch-and-bound but instead of always
- * choosing the state with the smallest cost, here we choose the child states
- * according to it's cost plus an heuristic that predicts how far that state is
- * from the solution.
+ * This approach relies on choosing the next state to expand based on its cost
+ * so far. Also, it creates a "bound" that prevents the search to go further
+ * than the already found best solution
  */
-public class AStar extends Approach {
+public class BranchAndBound extends Approach {
 
     int numberOfRectangles;
-    int bestSolutionSoFar = Integer.MAX_VALUE;
+    int bound = Integer.MAX_VALUE;
     boolean foundSolution = false;
 
-    public AStar(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
+    public BranchAndBound(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
         super(verts, rectanglesToCover);
         numberOfRectangles = rectanglesToCover.size();
     }
@@ -33,7 +32,7 @@ public class AStar extends Approach {
         Set<State> visited = new HashSet<>();
 
         // This is a MinHeap that compares the costs of the states at insertion
-        PriorityQueue<State> heap = new PriorityQueue<>((s1, s2) -> stateFullCost(s1) - stateFullCost(s2));
+        PriorityQueue<State> heap = new PriorityQueue<>((s1, s2) -> stateCost(s1) - stateCost(s2));
         heap.offer(currentState);
 
         while (!heap.isEmpty()) {
@@ -43,8 +42,8 @@ public class AStar extends Approach {
                 foundSolution = true;
 
                 int solution = s.getChosenVerts().size();
-                if (solution < bestSolutionSoFar) {
-                    bestSolutionSoFar = solution;
+                if (solution < bound) {
+                    bound = solution;
                     currentState = s;
 
                     // It is possible to prove that the solution will not be better than
@@ -57,7 +56,7 @@ public class AStar extends Approach {
 
             // Check if the cost of this state is equal or worse than the best solution. If
             // it is, we don't need to expand it.
-            if (stateCost(s) >= bestSolutionSoFar) {
+            if (stateCost(s) >= bound) {
                 continue;
             }
 
@@ -78,38 +77,20 @@ public class AStar extends Approach {
         }
 
         if (foundSolution)
-            return bestSolutionSoFar;
+            return bound;
 
         throw new PartitionProblemException("Unable to find a solution for this instance");
     }
 
     /**
-     * The state score is the sum between the cost from the root state to the
-     * current one plus the value of the heuristic. Since as we progress through the
-     * states we add one vert per expansion, the cost from the root to the current
-     * state is also the number of chosen vertexes.
+     * The cost of the state is the number of edges since the root. That is the same
+     * as the number of chosen verts, since we choose one vertex per expansion
      * 
-     * @param state - the state to evaluate
-     * @return the score of the state
+     * @param state to calculate the cost
+     * @return the cost of the state
      */
-    private int stateFullCost(State state) {
-        return stateCost(state) + heuristic(state);
-    }
-
     private int stateCost(State state) {
         return state.getChosenVerts().size();
-    }
-
-    /**
-     * As an heuristic, we will use the number of rectangles left as the predicted
-     * cost. This is an acceptable heuristic since to cover all the rectangles left
-     * we will need AT LEAST one vertex for each one. So, h(s) >= cost(s)
-     * 
-     * @param state
-     * @return
-     */
-    private int heuristic(State state) {
-        return state.getRectanglesLeft().size();
     }
 
 }
