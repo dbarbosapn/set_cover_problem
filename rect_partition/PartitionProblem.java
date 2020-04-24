@@ -11,6 +11,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import rect_partition.utils.Utils;
 import rect_partition.approaches.AStar;
@@ -27,8 +31,12 @@ public class PartitionProblem {
     private static final String headerText = "Welcome to the Rectangle Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
     private static int selectedApproach;
 
+    public static final String LOGGER = "PartitionProblemLogger";
+
     public static void main(String[] args) {
         Scanner stdin = new Scanner(System.in);
+
+        setupLogger();
 
         Utils.clearWindow(headerText);
 
@@ -71,6 +79,27 @@ public class PartitionProblem {
 
         file.close();
         stdin.close();
+    }
+
+    /**
+     * Sets up the logger to write at log.txt
+     */
+    private static void setupLogger() {
+        Logger logger = Logger.getLogger(LOGGER);
+
+        FileHandler fh;
+
+        try {
+            fh = new FileHandler("log.txt");
+            for (Handler handler : logger.getHandlers()) {
+                logger.removeHandler(handler);
+            }
+            logger.addHandler(fh);
+            fh.setFormatter(new SimpleFormatter());
+            logger.info("Logger initialized");
+        } catch (Exception e) {
+            // Ignore
+        }
     }
 
     /**

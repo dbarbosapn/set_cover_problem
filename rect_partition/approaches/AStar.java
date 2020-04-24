@@ -18,6 +18,7 @@ public class AStar extends Approach {
 
     int numberOfRectangles;
     int bestSolutionSoFar = Integer.MAX_VALUE;
+    boolean foundSolution = false;
 
     public AStar(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
         super(verts, rectanglesToCover);
@@ -30,13 +31,15 @@ public class AStar extends Approach {
         Set<State> visited = new HashSet<>();
 
         // This is a MinHeap that compares the scores of the states at insertion
-        PriorityQueue<State> heap = new PriorityQueue<>((s1, s2) -> stateScore(s1) - stateScore(s2));
+        PriorityQueue<State> heap = new PriorityQueue<>((s1, s2) -> stateFullCost(s1) - stateFullCost(s2));
         heap.offer(currentState);
 
         while (!heap.isEmpty()) {
             State s = heap.poll();
 
             if (s.isFinal()) {
+                foundSolution = true;
+
                 int solution = s.getChosenVerts().size();
                 if (solution < bestSolutionSoFar) {
                     bestSolutionSoFar = solution;
@@ -44,11 +47,16 @@ public class AStar extends Approach {
 
                     // It is possible to prove that the solution will not be better than
                     // Math.ceil(numRectanglesToCover / 3); therefore, we will use this as a breaker
-
                     if (solution <= Math.ceil((double) numberOfRectangles / 3d)) {
                         return solution;
                     }
                 }
+            }
+
+            // Check if the cost of this state is equal or worse than the best solution. If
+            // it is, we don't need to expand it.
+            if (stateCost(s) >= bestSolutionSoFar) {
+                continue;
             }
 
             List<State> neighbours = s.expand();
@@ -57,14 +65,18 @@ public class AStar extends Approach {
 
             for (State neighbour : neighbours) {
                 // In this A* approach, we're not updating cost values in the heap if we find
-                // the same state again. That is, because in this specific problem, if we find
-                // the same instance later it will have a bigger cost with no doubt. Because
-                // every edge in the graph has the same weight (1). So, we just add the child
+                // the same state again. That is because in this specific problem if we find
+                // the same instance later it will always have the same cost since the cost is
+                // as big as how many vertexes have been chosen. So, we just add the child
                 // states to the heap and keep doing the same thing until we find a solution
-                if (!visited.contains(neighbour))
+                if (!visited.contains(neighbour)) {
                     heap.offer(neighbour);
+                }
             }
         }
+
+        if (foundSolution)
+            return bestSolutionSoFar;
 
         throw new PartitionProblemException("Unable to find a solution for this instance");
     }
@@ -78,8 +90,12 @@ public class AStar extends Approach {
      * @param state - the state to evaluate
      * @return the score of the state
      */
-    private int stateScore(State state) {
-        return state.getChosenVerts().size() + heuristic(state);
+    private int stateFullCost(State state) {
+        return stateCost(state) + heuristic(state);
+    }
+
+    private int stateCost(State state) {
+        return state.getChosenVerts().size();
     }
 
     /**
