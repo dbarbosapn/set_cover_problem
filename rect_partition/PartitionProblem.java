@@ -38,46 +38,55 @@ public class PartitionProblem {
 
         setupLogger();
 
-        Utils.clearWindow(headerText);
+        while (true) {
+            Utils.clearWindow(headerText);
 
-        System.out.println("Choose an approach by entering the corresponding number: ");
-        // Approaches
-        System.out.println("1: Greedy - State that has less rectangles left to cover first");
-        System.out.println("2: Greedy - State that has the hardest rectangle covered first");
-        System.out.println("3: BFS (Stop at the first solution)");
-        System.out.println("4: BFS (Find the best solution)");
-        System.out.println("5: DFS (Stop at the first solution)");
-        System.out.println("6: DFS (Find the best solution)");
-        System.out.println("7: IDS (Stop at the first solution)");
-        System.out.println("8: A* - Rectangles left as heuristic (Find the best solution)");
+            System.out.println("Choose an approach by entering the corresponding number: ");
+            // Approaches
+            System.out.println("1: Greedy - State that has less rectangles left to cover first");
+            System.out.println("2: Greedy - State that has the hardest rectangle covered first");
+            System.out.println("3: BFS (Stop at the first solution)");
+            System.out.println("4: BFS (Find the best solution)");
+            System.out.println("5: DFS (Stop at the first solution)");
+            System.out.println("6: DFS (Find the best solution)");
+            System.out.println("7: IDS (Stop at the first solution)");
+            System.out.println("8: A* - Rectangles left as heuristic (Find the best solution)");
 
-        int chosen = stdin.nextInt();
-        Utils.clearWindow(headerText);
+            int chosen = stdin.nextInt();
+            Utils.clearWindow(headerText);
 
-        if (chosen < 1 || chosen > NUM_APPROACHES) {
-            System.out.println("Invalid number of approaches. (Must be between 1 and " + NUM_APPROACHES + ")");
-            stdin.close();
-            return;
+            if (chosen < 1 || chosen > NUM_APPROACHES) {
+                System.out.println("Invalid number of approaches. (Must be between 1 and " + NUM_APPROACHES + ")");
+                stdin.close();
+                return;
+            }
+
+            selectedApproach = chosen;
+
+            System.out.print("Insert the file path: ");
+
+            String filePath = stdin.next();
+            Scanner file;
+            try {
+                file = new Scanner(new File(filePath));
+            } catch (IOException e) {
+                Utils.logError(e);
+                stdin.close();
+                return;
+            }
+
+            Utils.clearWindow(headerText);
+
+            loadSets(file, stdin);
+
+            file.close();
+
+            System.out.print("Do you wish to start again? (Y/N): ");
+
+            if (!stdin.next().toLowerCase().startsWith("y"))
+                break;
         }
 
-        selectedApproach = chosen;
-
-        System.out.print("Insert the file path: ");
-
-        String filePath = stdin.next();
-        Scanner file;
-        try {
-            file = new Scanner(new File(filePath));
-        } catch (IOException e) {
-            Utils.logError(e);
-            stdin.close();
-            return;
-        }
-
-        Utils.clearWindow(headerText);
-        loadSets(file, stdin);
-
-        file.close();
         stdin.close();
     }
 
