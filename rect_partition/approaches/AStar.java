@@ -14,8 +14,7 @@ import rect_partition.utils.PartitionProblemException;
  * This approach is similar to the branch-and-bound but instead of always
  * expanding the smallest cost, this one relies on choosing the child states
  * according to it's cost plus an heuristic that predicts how far that state is
- * from the solution. Also, we stop expanding states if their cost is worse than
- * the best solution we've got so far.
+ * from the solution.
  */
 public class AStar extends Approach {
 
