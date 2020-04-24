@@ -13,7 +13,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import rect_partition.utils.Utils;
-
+import rect_partition.approaches.AStar;
 import rect_partition.approaches.Approach;
 import rect_partition.approaches.BFS;
 import rect_partition.approaches.DFS;
@@ -23,7 +23,7 @@ import rect_partition.approaches.IDFS;
 
 public class PartitionProblem {
 
-    private static final int NUM_APPROACHES = 7;
+    private static final int NUM_APPROACHES = 8;
     private static final String headerText = "Welcome to the Rectangle Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
     private static int selectedApproach;
 
@@ -41,6 +41,7 @@ public class PartitionProblem {
         System.out.println("5: DFS (Stop at the first solution)");
         System.out.println("6: DFS (Find the best solution)");
         System.out.println("7: IDS (Stop at the first solution)");
+        System.out.println("8: A* - Rectangles left as heuristic (Find the best solution)");
 
         int chosen = stdin.nextInt();
         Utils.clearWindow(headerText);
@@ -171,6 +172,8 @@ public class PartitionProblem {
                 return new DFS(verts, rectanglesToCover, false);
             case 7:
                 return new IDFS(verts, rectanglesToCover);
+            case 8:
+                return new AStar(verts, rectanglesToCover);
         }
 
         return null;
