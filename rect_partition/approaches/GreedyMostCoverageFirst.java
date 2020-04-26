@@ -46,7 +46,7 @@ public class GreedyMostCoverageFirst extends Approach {
 
         }
 
-        return currentState.getChosenVerts().size();
+        return currentState.getSolution();
     }
 
 }

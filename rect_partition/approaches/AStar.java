@@ -42,7 +42,7 @@ public class AStar extends Approach {
             if (s.isFinal()) {
                 foundSolution = true;
 
-                int solution = s.getChosenVerts().size();
+                int solution = s.getSolution();
                 if (solution < bestSolutionSoFar) {
                     bestSolutionSoFar = solution;
                     currentState = s;
@@ -97,7 +97,7 @@ public class AStar extends Approach {
     }
 
     private int stateCost(State state) {
-        return state.getChosenVerts().size();
+        return state.getSolution();
     }
 
     /**

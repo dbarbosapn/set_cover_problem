@@ -87,7 +87,7 @@ public class State {
      * @param v - the vert to choose
      * @return the resulting state
      */
-    private State chooseVert(Vert v) throws PartitionProblemException {
+    public State chooseVert(Vert v) throws PartitionProblemException {
         State clone = new State(this);
 
         if (!clone.vertsLeft.contains(v)) {
@@ -100,6 +100,55 @@ public class State {
         }
 
         return clone;
+    }
+
+    /**
+     * Gets the resulting state of unchoosing a vert
+     * 
+     * @param v - the vert to unchoose
+     * @return the resulting state
+     */
+    public State unchooseVert(Vert v) throws PartitionProblemException {
+        State clone = new State(this);
+
+        if (!clone.chosenVerts.contains(v)) {
+            throw new PartitionProblemException("The vertex must be in the chosen vertexes");
+        } else {
+            clone.vertsLeft.add(v);
+            clone.chosenVerts.remove(v);
+            Set<Integer> coveredRectangles = new HashSet<>();
+            for (Vert vert : clone.chosenVerts) {
+                coveredRectangles.addAll(vert.getRectangles());
+            }
+            clone.rectanglesCovered.removeAll(coveredRectangles);
+            clone.rectanglesLeft.addAll(clone.rectanglesCovered);
+            clone.rectanglesCovered = new HashSet<>(coveredRectangles);
+        }
+
+        return clone;
+    }
+
+    /**
+     * Returns the neighbour solutions of the current state. A neighbour solution is
+     * a state that is also final but with one less vertex
+     * 
+     * @return the list of the neighbours
+     * @throws PartitionProblemException
+     */
+    public List<State> neighbourSolutions() throws PartitionProblemException {
+        List<State> neighbours = new ArrayList<>(vertsLeft.size());
+
+        for (Vert v : chosenVerts) {
+            State unchoose = unchooseVert(v);
+            if (unchoose.isFinal())
+                neighbours.add(unchoose);
+        }
+
+        return neighbours;
+    }
+
+    public int getSolution() {
+        return chosenVerts.size();
     }
 
     @Override

@@ -46,17 +46,16 @@ public class BFS extends Approach {
                     if (n.isFinal()) {
                         if (firstSolution) {
                             this.currentState = n;
-                            return currentState.getChosenVerts().size();
-                        } else if (!currentState.isFinal()
-                                || currentState.getChosenVerts().size() < currentState.getChosenVerts().size()) {
+                            return currentState.getSolution();
+                        } else if (!currentState.isFinal() || currentState.getSolution() < currentState.getSolution()) {
 
                             this.currentState = n;
 
                             // It is possible to prove that the solution will not be better than
                             // Math.ceil(numRectanglesToCover / 3); therefore, we will use this as a breaker
 
-                            if (currentState.getChosenVerts().size() <= Math.ceil((double) numRectanglesToCover / 3d)) {
-                                return currentState.getChosenVerts().size();
+                            if (currentState.getSolution() <= Math.ceil((double) numRectanglesToCover / 3d)) {
+                                return currentState.getSolution();
                             }
                         }
                     }

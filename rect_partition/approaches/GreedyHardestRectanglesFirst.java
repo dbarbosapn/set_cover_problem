@@ -70,7 +70,7 @@ public class GreedyHardestRectanglesFirst extends Approach {
 
         }
 
-        return currentState.getChosenVerts().size();
+        return currentState.getSolution();
     }
 
 }

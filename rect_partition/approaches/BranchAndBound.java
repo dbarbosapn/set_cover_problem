@@ -41,7 +41,7 @@ public class BranchAndBound extends Approach {
             if (s.isFinal()) {
                 foundSolution = true;
 
-                int solution = s.getChosenVerts().size();
+                int solution = s.getSolution();
                 if (solution < bound) {
                     bound = solution;
                     currentState = s;
@@ -90,7 +90,7 @@ public class BranchAndBound extends Approach {
      * @return the cost of the state
      */
     private int stateCost(State state) {
-        return state.getChosenVerts().size();
+        return state.getSolution();
     }
 
 }

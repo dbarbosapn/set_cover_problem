@@ -34,7 +34,7 @@ public class IDFS extends Approach {
         while (true) {
             boolean remaining = DFS(root, k);
             if (found)
-                return currentState.getChosenVerts().size();
+                return currentState.getSolution();
             else if (!remaining) {
                 throw new PartitionProblemException("Unable to find a solution for this instance");
             }

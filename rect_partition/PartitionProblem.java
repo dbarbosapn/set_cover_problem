@@ -25,10 +25,11 @@ import rect_partition.approaches.DFS;
 import rect_partition.approaches.GreedyHardestRectanglesFirst;
 import rect_partition.approaches.GreedyMostCoverageFirst;
 import rect_partition.approaches.IDFS;
+import rect_partition.approaches.IteratedLocalSearch;
 
 public class PartitionProblem {
 
-    private static final int NUM_APPROACHES = 9;
+    private static final int NUM_APPROACHES = 11;
     private static final String headerText = "Welcome to the Rectangle Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
     private static int selectedApproach;
 
@@ -53,6 +54,8 @@ public class PartitionProblem {
             System.out.println("7: IDS (Stop at the first solution)");
             System.out.println("8: Branch And Bound");
             System.out.println("9: A* - Rectangles left as heuristic (Find the best solution)");
+            System.out.println("10: Iterated Local Search (With " + IteratedLocalSearch.K + " attempts)");
+            System.out.println("11: ILS with Randomization (With " + IteratedLocalSearch.K + " attempts)");
 
             int chosen = stdin.nextInt();
             Utils.clearWindow(headerText);
@@ -216,6 +219,10 @@ public class PartitionProblem {
                 return new BranchAndBound(verts, rectanglesToCover);
             case 9:
                 return new AStar(verts, rectanglesToCover);
+            case 10:
+                return new IteratedLocalSearch(verts, rectanglesToCover, false);
+            case 11:
+                return new IteratedLocalSearch(verts, rectanglesToCover, true);
         }
 
         return null;
