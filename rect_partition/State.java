@@ -148,6 +148,12 @@ public class State {
     }
 
     public int getSolution() {
+
+        // This bias will allow us to separate final solutions from non-final
+        if (!this.isFinal()) {
+            return (chosenVerts.size() * 2) + vertsLeft.size() + 1;
+        }
+
         return chosenVerts.size();
     }
 

@@ -24,7 +24,7 @@ import rect_partition.utils.PartitionProblemException;
 public class IteratedLocalSearch extends Approach {
 
     public static final int K = 500;
-    private static final int P = 4;
+    private static final int P = 3;
 
     private int bestSolution = Integer.MAX_VALUE;
     private boolean foundSolution = false;
