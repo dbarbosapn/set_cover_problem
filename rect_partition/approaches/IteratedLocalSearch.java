@@ -3,138 +3,135 @@ package rect_partition.approaches;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 import rect_partition.State;
 import rect_partition.Vert;
 import rect_partition.utils.PartitionProblemException;
 
-/**
- * In this approach we have 3 stages:
- * 
- * Initial Solution - We find an initial solution to the problem. We're using
- * the greedy approach to get it.
- * 
- * Perturbation - We perturbate the solution by adding a few vertexes according
- * to the P factor
- * 
- * Local Search - We get the solutions close to the current one in the solution
- * space and do a BFS to find the local minimum
- */
 public class IteratedLocalSearch extends Approach {
 
     public static final int K = 500;
-    private static final int P = 3;
+    private static final double VERTS_REMOVE_PERCENTAGE = 0.18;
+    private static final double VERTS_ADD_PERCENTAGE = 0.14;
+    private static final double PROBABILITY_ACCEPT_WRONG_SOLUTION = 0.2;
 
-    private int bestSolution = Integer.MAX_VALUE;
-    private boolean foundSolution = false;
-    private Approach initialSolutionApproach;
+    private int maxVertsRemove;
+    private int maxVertsAdd;
+
+    private Approach localSearchApproach;
+    private State cur;
+
     private boolean stochastic;
 
     public IteratedLocalSearch(Collection<Vert> verts, Collection<Integer> rectanglesToCover, boolean stochastic) {
         super(verts, rectanglesToCover);
-        // We will use the GreedyMostCoverageFirst approach as the local search method.
-        initialSolutionApproach = new GreedyMostCoverageFirst(verts, rectanglesToCover);
+        localSearchApproach = new GreedyMostCoverageFirst(verts, rectanglesToCover);
+
+        maxVertsAdd = (int) (VERTS_ADD_PERCENTAGE * verts.size());
+        maxVertsRemove = (int) (VERTS_REMOVE_PERCENTAGE * verts.size());
+
         this.stochastic = stochastic;
     }
 
     @Override
     public int solve() throws PartitionProblemException {
 
-        // First, we find a solution to begin with
-        findInitialSolution();
+        cur = currentState;
 
-        if (!foundSolution) {
-            throw new PartitionProblemException("Unable to find a solution for this instance");
-        }
+        // Find a solution to start with
+        localSearch();
 
-        // Then, we iterate K times
+        currentState = localSearchApproach.currentState;
+        cur = currentState;
+
+        // Repeat K times
         for (int i = 0; i < K; i++) {
-            // We perturbate the solution
-            perturbation();
-            // Then try to find a better solution
-            localSearch();
+            State newState = new State(cur);
+
+            // mutate the state
+            newState = perturbate(newState);
+
+            // Check if we accept the new one with the acceptance test
+            if (accept(newState)) {
+                cur = newState;
+            }
+
+            // Check if is the best and update
+            if (cur.getSolution() < currentState.getSolution()) {
+                currentState = cur;
+            }
+
+            this.statesExpanded++;
         }
 
-        return bestSolution;
+        return currentState.getSolution();
     }
 
     /**
-     * Find the neighbour solutions and find the local minimum with hill climbing
-     * (to local minimum)
+     * This function will return if the state should be accepted. If the stochastic
+     * flag is true, we also have a probability of accepting a wrong solution to
+     * allow more movement along the solution space
+     * 
+     * @param newState to be evaluated
+     * @return the boolean determining if the state should be accepted
+     */
+    private boolean accept(State newState) {
+        int newSolution = newState.getSolution();
+        int curSolution = cur.getSolution();
+
+        double probability = 0;
+
+        if (newSolution < curSolution)
+            probability = 1;
+        else if (stochastic)
+            probability = 1 - PROBABILITY_ACCEPT_WRONG_SOLUTION;
+
+        return probability > Math.random();
+    }
+
+    /**
+     * Perturbate the solution. In this specific implementation, we will add and
+     * remove some verts, randomly
+     * 
+     * @param newState
+     */
+    private State perturbate(State newState) throws PartitionProblemException {
+        int removeNum = (int) (Math.random() * maxVertsRemove);
+        int addNum = (int) (Math.random() * maxVertsAdd);
+
+        List<Vert> chosenVerts = new ArrayList<>(newState.getChosenVerts());
+        List<Vert> vertsLeft = new ArrayList<>(newState.getVertsLeft());
+
+        for (int i = 0; i < removeNum; i++) {
+            if (chosenVerts.size() == 0)
+                break;
+
+            int index = (int) (Math.random() * chosenVerts.size());
+            newState = newState.unchooseVert(chosenVerts.get(index));
+            chosenVerts.remove(index);
+        }
+
+        for (int i = 0; i < addNum; i++) {
+            if (vertsLeft.size() == 0)
+                break;
+
+            int index = (int) (Math.random() * vertsLeft.size());
+            newState = newState.chooseVert(vertsLeft.get(index));
+            vertsLeft.remove(index);
+        }
+
+        return newState;
+    }
+
+    /**
+     * Find a local solution with the approach defined in the constructor
+     * 
+     * @throws PartitionProblemException
      */
     private void localSearch() throws PartitionProblemException {
-        State cur = currentState;
-
-        while (true) {
-            List<State> neighbours = cur.neighbourSolutions();
-            int best = Integer.MAX_VALUE;
-            State next = null;
-
-            this.statesExpanded += neighbours.size();
-
-            for (State n : neighbours) {
-                if (n.getSolution() < best) {
-                    next = n;
-                    best = n.getSolution();
-                }
-            }
-
-            if (next == null || best >= cur.getSolution()) {
-                currentState = cur;
-                return;
-            }
-
-            cur = next;
-        }
-    }
-
-    /**
-     * The perturbation method will add P vertexes to the current solution, thus
-     * finding a different worse solution that we can improve in the next step. If
-     * the stochastic flag is true, we will randomly choose the verts
-     */
-    private void perturbation() throws PartitionProblemException {
-        if (stochastic) {
-            Random rnd = new Random();
-
-            List<Vert> vertsLeft = new ArrayList<>(currentState.getVertsLeft());
-
-            for (int i = 0; i < P; i++) {
-                if (vertsLeft.size() == 0)
-                    break;
-
-                int index = rnd.nextInt(vertsLeft.size());
-
-                currentState = currentState.chooseVert(vertsLeft.get(index));
-                vertsLeft.remove(index);
-            }
-
-        } else {
-            int limitCounter = 0;
-            for (Vert v : currentState.getVertsLeft()) {
-                if (limitCounter == P)
-                    break;
-                currentState = currentState.chooseVert(v);
-                limitCounter++;
-            }
-        }
-    }
-
-    /**
-     * Find the initial solution with the approach chosen in the constructor
-     */
-    private void findInitialSolution() throws PartitionProblemException {
-        initialSolutionApproach.currentState = this.currentState;
-        int solution = initialSolutionApproach.solve();
-
-        if (solution < bestSolution) {
-            bestSolution = solution;
-            this.currentState = initialSolutionApproach.currentState;
-            foundSolution = true;
-        }
-
-        this.statesExpanded += initialSolutionApproach.statesExpanded;
+        localSearchApproach.currentState = cur;
+        localSearchApproach.solve();
+        cur = localSearchApproach.currentState;
     }
 
 }
