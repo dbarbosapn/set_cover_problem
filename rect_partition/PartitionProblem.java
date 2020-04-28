@@ -16,11 +16,14 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import rect_partition.utils.DataConverter;
 import rect_partition.utils.Utils;
+import rect_partition.approaches.AC3;
 import rect_partition.approaches.AStar;
 import rect_partition.approaches.Approach;
 import rect_partition.approaches.BFS;
 import rect_partition.approaches.BranchAndBound;
+import rect_partition.approaches.CSPApproach;
 import rect_partition.approaches.DFS;
 import rect_partition.approaches.GreedyHardestRectanglesFirst;
 import rect_partition.approaches.GreedyMostCoverageFirst;
@@ -30,7 +33,7 @@ import rect_partition.approaches.SimulatedAnnealing;
 
 public class PartitionProblem {
 
-    private static final int NUM_APPROACHES = 12;
+    private static final int NUM_APPROACHES = 13;
     private static final String headerText = "Welcome to the Rectangle Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
     private static int selectedApproach;
 
@@ -58,6 +61,7 @@ public class PartitionProblem {
             System.out.println("10: Iterated Local Search (With " + IteratedLocalSearch.K + " attempts)");
             System.out.println("11: ILS with Randomization (With " + IteratedLocalSearch.K + " attempts)");
             System.out.println("12: Simulated Annealing");
+            System.out.println("13: CSP - AC-3");
 
             int chosen = stdin.nextInt();
             Utils.clearWindow(headerText);
@@ -151,14 +155,29 @@ public class PartitionProblem {
      * @param stdin
      */
     private static void solveSet(Scanner file, Scanner stdin, int setNumber) {
+
+        if (selectedApproach >= 14) {
+            solveProlog(file, stdin, setNumber);
+            return;
+        }
+
         int rectangles = file.nextInt();
         Map<Integer, Vert> vertMap = new HashMap<>();
         Set<Integer> rectanglesToCover = new HashSet<>();
 
         readSetData(rectangles, rectanglesToCover, vertMap, file);
 
-        Approach approach = chooseApproach(vertMap.values(), rectanglesToCover);
+        if (selectedApproach == 13) {
+            CSPApproach approach = new AC3(vertMap.values(), rectanglesToCover);
+            startSolving(approach, stdin, setNumber);
+        } else {
+            Approach approach = chooseApproach(vertMap.values(), rectanglesToCover);
+            startSolving(approach, stdin, setNumber);
+        }
 
+    }
+
+    private static void startSolving(Approach approach, Scanner stdin, int setNumber) {
         try {
             int answer = approach.solve();
 
@@ -170,7 +189,7 @@ public class PartitionProblem {
             System.out.print("Do you want to get an output of the vertexes chosen? (Y/N): ");
 
             if (stdin.next().toLowerCase().startsWith("y")) {
-                String filename = outputVertexes(approach, setNumber);
+                String filename = outputVertexes(approach.getChosenVerts(), setNumber);
                 System.out.println("Your file is located at " + filename);
             }
 
@@ -180,7 +199,37 @@ public class PartitionProblem {
         }
     }
 
-    private static String outputVertexes(Approach approach, int setNumber) throws FileNotFoundException {
+    private static void startSolving(CSPApproach approach, Scanner stdin, int setNumber) {
+        try {
+            int answer = approach.solve();
+
+            Utils.clearWindow(headerText);
+
+            System.out.println("Number of vertexes in solution: " + answer);
+            System.out.println("Number of arcs checked: " + approach.getArcsChecked());
+            System.out.println();
+            System.out.print("Do you want to get an output of the vertexes chosen? (Y/N): ");
+
+            if (stdin.next().toLowerCase().startsWith("y")) {
+                String filename = outputVertexes(approach.getChosenVerts(), setNumber);
+                System.out.println("Your file is located at " + filename);
+            }
+
+        } catch (Exception e) {
+            Utils.logError(e);
+            return;
+        }
+    }
+
+    private static void solveProlog(Scanner file, Scanner stdin, int setNumber) {
+        try {
+            DataConverter.generatePrologDataFile(file);
+        } catch (Exception e) {
+            Utils.logError(e);
+        }
+    }
+
+    private static String outputVertexes(Set<Vert> chosenVerts, int setNumber) throws FileNotFoundException {
         final String dir = System.getProperty("user.dir");
         File directory = new File(dir + "/output");
         if (!directory.exists()) {
@@ -188,7 +237,7 @@ public class PartitionProblem {
         }
         String filename = dir + "/output/vertexes-set" + setNumber + ".txt";
         PrintWriter writer = new PrintWriter(new FileOutputStream(filename, false));
-        for (Vert v : approach.getChosenVerts())
+        for (Vert v : chosenVerts)
             writer.println(v);
         writer.close();
         return filename;

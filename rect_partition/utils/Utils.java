@@ -5,6 +5,7 @@ public class Utils {
         System.out.println("Partition Problem Exception: " + e.getMessage());
         if (e.getCause() != null)
             System.out.println(e.getCause());
+        e.printStackTrace();
     }
 
     public static void clearWindow() {
