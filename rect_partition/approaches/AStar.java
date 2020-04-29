@@ -97,7 +97,7 @@ public class AStar extends Approach {
     }
 
     private int stateCost(State state) {
-        return state.getSolution();
+        return state.getChosenVerts().size();
     }
 
     /**

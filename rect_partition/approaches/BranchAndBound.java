@@ -90,7 +90,7 @@ public class BranchAndBound extends Approach {
      * @return the cost of the state
      */
     private int stateCost(State state) {
-        return state.getSolution();
+        return state.getChosenVerts().size();
     }
 
 }
