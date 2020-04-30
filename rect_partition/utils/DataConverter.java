@@ -2,14 +2,16 @@ package rect_partition.utils;
 
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import rect_partition.Vert;
 
 public class DataConverter {
 
-    private static final String DATA_FILE = "prolog_data.tmp";
+    private static final String DATA_FILE = "rect_partition/clp_approaches/prolog_data.tmp";
 
     public static void generatePrologDataFile(Scanner input) throws PartitionProblemException {
         try {
@@ -21,13 +23,14 @@ public class DataConverter {
 
             List<Vert> verts = new ArrayList<>();
 
+            List<RectangleCache> caches = new ArrayList<>();
+
             for (int i = 0; i < nrects; i++) {
 
                 int r = input.nextInt();
                 int nverts = input.nextInt();
 
-                StringBuilder sb = new StringBuilder();
-                sb.append(String.format("r(%d, %d, [", r, nverts));
+                RectangleCache cache = new RectangleCache(r);
 
                 for (int j = 0; j < nverts; j++) {
                     Vert v = new Vert(input.nextInt(), input.nextInt());
@@ -37,18 +40,27 @@ public class DataConverter {
                         file.write(String.format("v(%d, %d, %d).\n", verts.indexOf(v) + 1, v.getX(), v.getY()));
                     }
 
-                    sb.append(String.valueOf(verts.indexOf(v) + 1));
-
-                    if (j != nverts - 1) {
-                        sb.append(',');
-                    }
+                    cache.verts.add(verts.indexOf(v) + 1);
 
                 }
+
+                caches.add(cache);
+
+            }
+
+            for (RectangleCache cache : caches) {
+                StringBuilder sb = new StringBuilder(String.format("r(%d, %d, [", cache.rectNum, cache.verts.size()));
+
+                for (int v : cache.verts) {
+                    sb.append(v);
+                    sb.append(',');
+                }
+
+                sb.setLength(sb.length() - 1);
 
                 sb.append("]).\n");
 
                 file.write(sb.toString());
-
             }
 
             int ngoal = input.nextInt();
@@ -70,6 +82,15 @@ public class DataConverter {
             file.close();
         } catch (Exception e) {
             throw new PartitionProblemException(e.getMessage(), e.getCause());
+        }
+    }
+
+    private static class RectangleCache {
+        int rectNum;
+        Set<Integer> verts = new HashSet<>();
+
+        RectangleCache(int rectNum) {
+            this.rectNum = rectNum;
         }
     }
 
