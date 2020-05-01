@@ -16,6 +16,11 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+import com.parctechnologies.eclipse.EclipseEngine;
+import com.parctechnologies.eclipse.EclipseEngineOptions;
+import com.parctechnologies.eclipse.EmbeddedEclipse;
+
 import rect_partition.utils.DataConverter;
 import rect_partition.utils.Utils;
 import rect_partition.approaches.AC3;
@@ -35,7 +40,9 @@ public class PartitionProblem {
 
     private static final int NUM_APPROACHES = 14;
     private static final String headerText = "Welcome to the Rectangle Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
+
     private static int selectedApproach;
+    private static boolean engineStarted = false;
 
     public static final String LOGGER = "PartitionProblemLogger";
 
@@ -62,7 +69,7 @@ public class PartitionProblem {
             System.out.println("11: ILS with Randomization (With " + IteratedLocalSearch.K + " attempts)");
             System.out.println("12: Simulated Annealing");
             System.out.println("13: CSP - AC-3");
-            System.out.println("14: Prolog");
+            System.out.println("14: ECLiPSe CLP");
 
             int chosen = stdin.nextInt();
             Utils.clearWindow(headerText);
@@ -100,6 +107,15 @@ public class PartitionProblem {
         }
 
         stdin.close();
+    }
+
+    private static void startEclipseEngine() throws Exception {
+        EclipseEngineOptions options = new EclipseEngineOptions();
+        options.setUseQueues(false);
+
+        EmbeddedEclipse.getInstance(options);
+
+        engineStarted = true;
     }
 
     /**
@@ -225,6 +241,21 @@ public class PartitionProblem {
     private static void solveProlog(Scanner file, Scanner stdin, int setNumber) {
         try {
             DataConverter.generatePrologDataFile(file);
+
+            if (!engineStarted) {
+                startEclipseEngine();
+            }
+
+            EclipseEngine engine = EmbeddedEclipse.getInstance();
+
+            File program = new File("classes/rect_partition/clp_approaches/partition_problem.ecl");
+
+            Utils.clearWindow(headerText);
+
+            engine.compile(program);
+            CompoundTerm term = engine.rpc("partition_problem(S)");
+            System.out.println(term.arg(1));
+
         } catch (Exception e) {
             Utils.logError(e);
         }

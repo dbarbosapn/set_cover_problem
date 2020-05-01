@@ -11,7 +11,7 @@ import rect_partition.Vert;
 
 public class DataConverter {
 
-    private static final String DATA_FILE = "rect_partition/clp_approaches/prolog_data.tmp";
+    private static final String DATA_FILE = "classes/rect_partition/clp_approaches/prolog_data.tmp";
 
     public static void generatePrologDataFile(Scanner input) throws PartitionProblemException {
         try {

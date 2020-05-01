@@ -1,3 +1,4 @@
 #!/bin/bash
 
-java rect_partition.PartitionProblem
+. config.properties 
+java -cp "classes:lib/*" -Declipse.directory=$eclipseDir rect_partition.PartitionProblem

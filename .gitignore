@@ -2,3 +2,4 @@
 output/
 log*
 *.tmp
+classes/
