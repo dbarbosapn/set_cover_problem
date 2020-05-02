@@ -38,7 +38,7 @@ import rect_partition.approaches.SimulatedAnnealing;
 
 public class PartitionProblem {
 
-    private static final int NUM_APPROACHES = 14;
+    private static final int NUM_APPROACHES = 15;
     private static final String headerText = "Welcome to the Rectangle Partition Problem.\nThis software was designed and developed by Diogo Barbosa.\n";
 
     private static int selectedApproach;
@@ -70,6 +70,7 @@ public class PartitionProblem {
             System.out.println("12: Simulated Annealing");
             System.out.println("13: CSP - AC-3");
             System.out.println("14: ECLiPSe CLP");
+            System.out.println("15: ECLiPSe CLP - Assign colors to verts");
 
             int chosen = stdin.nextInt();
             Utils.clearWindow(headerText);
@@ -253,8 +254,15 @@ public class PartitionProblem {
             Utils.clearWindow(headerText);
 
             engine.compile(program);
-            CompoundTerm term = engine.rpc("partition_problem(S)");
-            System.out.println(term.arg(1));
+
+            if (selectedApproach == 14) {
+                CompoundTerm term = engine.rpc("partition_problem(S)");
+                System.out.println("Chosen Verts: " + term.arg(1));
+            } else {
+                CompoundTerm term = engine.rpc("partition_color_problem(C, S)");
+                System.out.println("Chosen Verts: " + term.arg(2));
+                System.out.println("Colors: " + term.arg(1));
+            }
 
         } catch (Exception e) {
             Utils.logError(e);
