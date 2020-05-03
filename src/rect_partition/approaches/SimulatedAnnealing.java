@@ -10,10 +10,10 @@ import rect_partition.utils.PartitionProblemException;
 
 public class SimulatedAnnealing extends Approach {
 
-    private static final double INITIAL_TEMP = 10000;
-    private static final double COOLING_RATE = 0.003;
-    private static final double VERTS_REMOVE_PERCENTAGE = 0.18;
-    private static final double VERTS_ADD_PERCENTAGE = 0.14;
+    public static double INITIAL_TEMP = 10000;
+    public static double COOLING_RATE = 0.003;
+    public static double VERTS_REMOVE_PERCENTAGE = 0.18;
+    public static double VERTS_ADD_PERCENTAGE = 0.14;
 
     private int maxVertsRemove;
     private int maxVertsAdd;

@@ -5,20 +5,20 @@
 
 :- compile("prolog_data.tmp").
 
-partition_problem(S) :-
+partition_problem(S, Selection, Choice, Search) :-
     generate_vert_list(Verts),
     generate_vars_list(Vars, Verts),
     Vars #:: 0..1,
     generate_rectangle_list(GRects),
     set_rect_constraints(Vars, GRects),
     set_choose_cost_constraints(Vars, Cost),
-    minimize(search([Cost|Vars], 0, input_order, indomain, complete, []), Cost),
+    minimize(search([Cost|Vars], 0, Selection, Choice, Search, []), Cost),
     get_chosen_verts(Vars, S).
 
-partition_color_problem(C, S) :-
+partition_color_problem(C, S, Selection, Choice, Search) :-
     generate_vert_list(Verts),
     generate_vars_list(Vars, Verts),
-    partition_problem(S),
+    partition_problem(S, Selection, Choice, Search),
     length(S, MaxColor),
     Vars #:: 0..MaxColor,
     length(Verts, NVerts),
@@ -26,7 +26,7 @@ partition_color_problem(C, S) :-
     generate_rectangle_list(GRects),
     set_color_constraints(GRects, S, Vars),
     Cost #= sum(Vars),
-    minimize(search([Cost|Vars], 0, input_order, indomain, complete, []), Cost),
+    minimize(search([Cost|Vars], 0, Selection, Choice, Search, []), Cost),
     C = Vars.
 
 

@@ -1,14 +1,17 @@
 package rect_partition;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.FileHandler;
@@ -46,10 +49,16 @@ public class PartitionProblem {
 
     public static final String LOGGER = "PartitionProblemLogger";
 
+    private static String CLPselectionMethod = "input_order";
+    private static String CLPchoiceMethod = "indomain";
+    private static String CLPsearchMethod = "complete";
+
     public static void main(String[] args) {
         Scanner stdin = new Scanner(System.in);
 
         setupLogger();
+
+        readProperties();
 
         while (true) {
             Utils.clearWindow(headerText);
@@ -65,8 +74,8 @@ public class PartitionProblem {
             System.out.println("7: IDS (Stop at the first solution)");
             System.out.println("8: Branch And Bound");
             System.out.println("9: A* - Rectangles left as heuristic (Find the best solution)");
-            System.out.println("10: Iterated Local Search (With " + IteratedLocalSearch.K + " attempts)");
-            System.out.println("11: ILS with Randomization (With " + IteratedLocalSearch.K + " attempts)");
+            System.out.println("10: Iterated Local Search");
+            System.out.println("11: ILS with Randomization");
             System.out.println("12: Simulated Annealing");
             System.out.println("13: CSP - AC-3");
             System.out.println("14: ECLiPSe CLP");
@@ -108,6 +117,40 @@ public class PartitionProblem {
         }
 
         stdin.close();
+    }
+
+    private static void readProperties() {
+        try {
+            Properties properties = new Properties();
+            String propFile = "config.properties";
+            InputStream stream = new FileInputStream(new File(propFile));
+            properties.load(stream);
+
+            IDFS.INITIAL_K = Integer
+                    .valueOf(properties.getProperty("IDFSinitialDepth", String.valueOf(IDFS.INITIAL_K)));
+
+            IteratedLocalSearch.K = Integer
+                    .valueOf(properties.getProperty("ILSiterations", String.valueOf(IteratedLocalSearch.K)));
+
+            SimulatedAnnealing.INITIAL_TEMP = Double.valueOf(
+                    properties.getProperty("SAinitialTemperature", String.valueOf(SimulatedAnnealing.INITIAL_TEMP)));
+
+            SimulatedAnnealing.COOLING_RATE = Double
+                    .valueOf(properties.getProperty("SAcoolingRate", String.valueOf(SimulatedAnnealing.COOLING_RATE)));
+
+            SimulatedAnnealing.VERTS_REMOVE_PERCENTAGE = Double.valueOf(properties.getProperty("SAvertRemovePercentage",
+                    String.valueOf(SimulatedAnnealing.VERTS_REMOVE_PERCENTAGE)));
+
+            SimulatedAnnealing.VERTS_ADD_PERCENTAGE = Double.valueOf(properties.getProperty("SAvertAddPercentage",
+                    String.valueOf(SimulatedAnnealing.VERTS_ADD_PERCENTAGE)));
+
+            CLPchoiceMethod = properties.getProperty("CLPchoiceMethod", CLPchoiceMethod);
+            CLPselectionMethod = properties.getProperty("CLPselectionMethod", CLPselectionMethod);
+            CLPsearchMethod = properties.getProperty("CLPsearchMethod", CLPsearchMethod);
+
+        } catch (Exception e) {
+            Utils.logError(e);
+        }
     }
 
     private static void startEclipseEngine() throws Exception {
@@ -256,10 +299,12 @@ public class PartitionProblem {
             engine.compile(program);
 
             if (selectedApproach == 14) {
-                CompoundTerm term = engine.rpc("partition_problem(S)");
+                CompoundTerm term = engine.rpc(String.format("partition_problem(S, %s, %s, %s)", CLPselectionMethod,
+                        CLPchoiceMethod, CLPsearchMethod));
                 System.out.println("Chosen Verts: " + term.arg(1));
             } else {
-                CompoundTerm term = engine.rpc("partition_color_problem(C, S)");
+                CompoundTerm term = engine.rpc(String.format("partition_color_problem(C, S, %s, %s, %s)",
+                        CLPselectionMethod, CLPchoiceMethod, CLPsearchMethod));
                 System.out.println("Chosen Verts: " + term.arg(2));
                 System.out.println("Colors: " + term.arg(1));
             }

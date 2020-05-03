@@ -17,7 +17,7 @@ import rect_partition.utils.PartitionProblemException;
  */
 public class IDFS extends Approach {
 
-    private static final int INITIAL_K = 0;
+    public static int INITIAL_K = 0;
 
     private boolean found = false;
 

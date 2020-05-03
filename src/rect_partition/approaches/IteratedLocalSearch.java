@@ -10,7 +10,7 @@ import rect_partition.utils.PartitionProblemException;
 
 public class IteratedLocalSearch extends Approach {
 
-    public static final int K = 500;
+    public static int K = 500;
     private static final double VERTS_REMOVE_PERCENTAGE = 0.18;
     private static final double VERTS_ADD_PERCENTAGE = 0.14;
     private static final double PROBABILITY_ACCEPT_WRONG_SOLUTION = 0.2;
