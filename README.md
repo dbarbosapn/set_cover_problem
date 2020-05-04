@@ -32,6 +32,7 @@ Finally at the end of the file, we have:
 - An integer representing the number of rectangles to cover followed by their identifiers
 
 In the file [data1.txt](./data1.txt) we have a very small example corresponding to the following image.
+
 ![data1.txt](.img/data1.png)
 
 ## About the Approaches
