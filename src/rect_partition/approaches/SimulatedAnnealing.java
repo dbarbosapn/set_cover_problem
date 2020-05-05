@@ -12,8 +12,8 @@ public class SimulatedAnnealing extends Approach {
 
     public static double INITIAL_TEMP = 10000;
     public static double COOLING_RATE = 0.003;
-    public static double VERTS_REMOVE_PERCENTAGE = 0.18;
-    public static double VERTS_ADD_PERCENTAGE = 0.14;
+    public static double VERTS_REMOVE_PERCENTAGE = 18;
+    public static double VERTS_ADD_PERCENTAGE = 14;
 
     private int maxVertsRemove;
     private int maxVertsAdd;
@@ -25,8 +25,8 @@ public class SimulatedAnnealing extends Approach {
         super(verts, rectanglesToCover);
         initialApproach = new GreedyMostCoverageFirst(verts, rectanglesToCover);
 
-        maxVertsAdd = (int) (VERTS_ADD_PERCENTAGE * verts.size());
-        maxVertsRemove = (int) (VERTS_REMOVE_PERCENTAGE * verts.size());
+        maxVertsAdd = (int) (VERTS_ADD_PERCENTAGE / 100d * verts.size());
+        maxVertsRemove = (int) (VERTS_REMOVE_PERCENTAGE / 100d * verts.size());
     }
 
     @Override

@@ -35,7 +35,7 @@ import rect_partition.approaches.CSPApproach;
 import rect_partition.approaches.DFS;
 import rect_partition.approaches.GreedyHardestRectanglesFirst;
 import rect_partition.approaches.GreedyMostCoverageFirst;
-import rect_partition.approaches.IDFS;
+import rect_partition.approaches.IDDFS;
 import rect_partition.approaches.IteratedLocalSearch;
 import rect_partition.approaches.SimulatedAnnealing;
 
@@ -73,7 +73,7 @@ public class PartitionProblem {
             System.out.println("6: DFS (Find the best solution)");
             System.out.println("7: IDS (Stop at the first solution)");
             System.out.println("8: Branch And Bound");
-            System.out.println("9: A* - Rectangles left as heuristic (Find the best solution)");
+            System.out.println("9: A* - Rectangles left as heuristic");
             System.out.println("10: Iterated Local Search");
             System.out.println("11: ILS with Randomization");
             System.out.println("12: Simulated Annealing");
@@ -126,11 +126,20 @@ public class PartitionProblem {
             InputStream stream = new FileInputStream(new File(propFile));
             properties.load(stream);
 
-            IDFS.INITIAL_K = Integer
-                    .valueOf(properties.getProperty("IDFSinitialDepth", String.valueOf(IDFS.INITIAL_K)));
+            IDDFS.INITIAL_K = Integer
+                    .valueOf(properties.getProperty("IDDFSinitialDepth", String.valueOf(IDDFS.INITIAL_K)));
 
             IteratedLocalSearch.K = Integer
                     .valueOf(properties.getProperty("ILSiterations", String.valueOf(IteratedLocalSearch.K)));
+
+            IteratedLocalSearch.VERTS_REMOVE_PERCENTAGE = Double.valueOf(properties.getProperty(
+                    "ILSvertRemovePercentage", String.valueOf(IteratedLocalSearch.VERTS_REMOVE_PERCENTAGE)));
+
+            IteratedLocalSearch.VERTS_ADD_PERCENTAGE = Double.valueOf(properties.getProperty("ILSvertAddPercentage",
+                    String.valueOf(IteratedLocalSearch.VERTS_ADD_PERCENTAGE)));
+
+            IteratedLocalSearch.PROBABILITY_ACCEPT_WRONG_SOLUTION = Double.valueOf(properties.getProperty(
+                    "ILSprobWrongAccept", String.valueOf(IteratedLocalSearch.PROBABILITY_ACCEPT_WRONG_SOLUTION)));
 
             SimulatedAnnealing.INITIAL_TEMP = Double.valueOf(
                     properties.getProperty("SAinitialTemperature", String.valueOf(SimulatedAnnealing.INITIAL_TEMP)));
@@ -350,7 +359,7 @@ public class PartitionProblem {
             case 6:
                 return new DFS(verts, rectanglesToCover, false);
             case 7:
-                return new IDFS(verts, rectanglesToCover);
+                return new IDDFS(verts, rectanglesToCover);
             case 8:
                 return new BranchAndBound(verts, rectanglesToCover);
             case 9:

@@ -11,9 +11,9 @@ import rect_partition.utils.PartitionProblemException;
 public class IteratedLocalSearch extends Approach {
 
     public static int K = 500;
-    private static final double VERTS_REMOVE_PERCENTAGE = 0.18;
-    private static final double VERTS_ADD_PERCENTAGE = 0.14;
-    private static final double PROBABILITY_ACCEPT_WRONG_SOLUTION = 0.2;
+    public static double VERTS_REMOVE_PERCENTAGE = 18;
+    public static double VERTS_ADD_PERCENTAGE = 14;
+    public static double PROBABILITY_ACCEPT_WRONG_SOLUTION = 0.2;
 
     private int maxVertsRemove;
     private int maxVertsAdd;
@@ -27,8 +27,8 @@ public class IteratedLocalSearch extends Approach {
         super(verts, rectanglesToCover);
         localSearchApproach = new GreedyMostCoverageFirst(verts, rectanglesToCover);
 
-        maxVertsAdd = (int) (VERTS_ADD_PERCENTAGE * verts.size());
-        maxVertsRemove = (int) (VERTS_REMOVE_PERCENTAGE * verts.size());
+        maxVertsAdd = (int) (VERTS_ADD_PERCENTAGE / 100d * verts.size());
+        maxVertsRemove = (int) (VERTS_REMOVE_PERCENTAGE / 100d * verts.size());
 
         this.stochastic = stochastic;
     }

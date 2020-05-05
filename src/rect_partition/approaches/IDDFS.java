@@ -11,17 +11,17 @@ import rect_partition.Vert;
 import rect_partition.utils.PartitionProblemException;
 
 /**
- * This approach is a very straight forward IDFS with no limit for K. We're not
+ * This approach is a very straight forward IDDFS with no limit for K. We're not
  * implementing the "wait for best solution" approach because it would be an
  * extremely slow algorithm in the worst case even for small instances.
  */
-public class IDFS extends Approach {
+public class IDDFS extends Approach {
 
     public static int INITIAL_K = 0;
 
     private boolean found = false;
 
-    public IDFS(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
+    public IDDFS(Collection<Vert> verts, Collection<Integer> rectanglesToCover) {
         super(verts, rectanglesToCover);
     }
 
