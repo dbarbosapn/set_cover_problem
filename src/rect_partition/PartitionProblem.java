@@ -67,11 +67,11 @@ public class PartitionProblem {
             // Approaches
             System.out.println("1: Greedy - State that has less rectangles left to cover first");
             System.out.println("2: Greedy - State that has the hardest rectangle covered first");
-            System.out.println("3: BFS (Stop at the first solution)");
+            System.out.println("3: BFS (Stop at the first final solution)");
             System.out.println("4: BFS (Find the best solution)");
-            System.out.println("5: DFS (Stop at the first solution)");
+            System.out.println("5: DFS (Stop at the first final solution)");
             System.out.println("6: DFS (Find the best solution)");
-            System.out.println("7: IDS (Stop at the first solution)");
+            System.out.println("7: IDDFS (Stop at the first final solution)");
             System.out.println("8: Branch And Bound");
             System.out.println("9: A* - Rectangles left as heuristic");
             System.out.println("10: Iterated Local Search");

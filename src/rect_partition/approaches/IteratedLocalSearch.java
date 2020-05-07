@@ -51,6 +51,8 @@ public class IteratedLocalSearch extends Approach {
             // mutate the state
             newState = perturbate(newState);
 
+            this.statesExpanded++;
+
             // Check if we accept the new one with the acceptance test
             if (accept(newState)) {
                 cur = newState;
@@ -60,10 +62,7 @@ public class IteratedLocalSearch extends Approach {
             if (cur.getSolution() < currentState.getSolution()) {
                 currentState = cur;
             }
-
-            this.statesExpanded++;
         }
-
         return currentState.getSolution();
     }
 
@@ -129,9 +128,12 @@ public class IteratedLocalSearch extends Approach {
      * @throws PartitionProblemException
      */
     private void localSearch() throws PartitionProblemException {
+        localSearchApproach.statesExpanded = 0;
         localSearchApproach.currentState = cur;
         localSearchApproach.solve();
         cur = localSearchApproach.currentState;
+        this.statesExpanded += localSearchApproach.statesExpanded;
+
     }
 
 }
