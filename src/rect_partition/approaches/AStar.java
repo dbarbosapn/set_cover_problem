@@ -101,15 +101,13 @@ public class AStar extends Approach {
     }
 
     /**
-     * As an heuristic, we will use the number of rectangles left as the predicted
-     * cost. This is an acceptable heuristic since to cover all the rectangles left
-     * we will need AT LEAST one vertex for each one. So, h(s) >= cost(s)
+     * h(s) <= cost(s)
      * 
      * @param state
      * @return
      */
     private int heuristic(State state) {
-        return state.getRectanglesLeft().size();
+        return (int) Math.ceil((double) state.getRectanglesLeft().size() / 3d);
     }
 
 }
