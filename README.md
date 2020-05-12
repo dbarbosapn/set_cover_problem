@@ -52,5 +52,6 @@ In the [config.properties](./config.properties) file we can set a few properties
 - **CLPselectionMethod**: The selection method of the CLP search (Default input_order)
 - **CLPchoiceMethod**: The choice method of the CLP search (Default indomain)
 - **CLPsearchMethod**: The choice method of the CLP search (Default complete)
+- **timeout**: Limit time for execution per instance in seconds (Default 120)
 
 For the last **3** properties (CLP), please refer to [http://eclipseclp.org/doc/bips/lib/ic/search-6.html](http://eclipseclp.org/doc/bips/lib/ic/search-6.html)

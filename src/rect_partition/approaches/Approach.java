@@ -15,6 +15,7 @@ public abstract class Approach {
 
     protected int statesExpanded;
     protected State currentState;
+    public static int timeout = 120;
 
     /**
      * Public constructor

@@ -14,6 +14,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -153,6 +157,8 @@ public class PartitionProblem {
             SimulatedAnnealing.VERTS_ADD_PERCENTAGE = Double.valueOf(properties.getProperty("SAvertAddPercentage",
                     String.valueOf(SimulatedAnnealing.VERTS_ADD_PERCENTAGE)));
 
+            Approach.timeout = Integer.valueOf(properties.getProperty("timeout", String.valueOf(Approach.timeout)));
+
             CLPchoiceMethod = properties.getProperty("CLPchoiceMethod", CLPchoiceMethod);
             CLPselectionMethod = properties.getProperty("CLPselectionMethod", CLPselectionMethod);
             CLPsearchMethod = properties.getProperty("CLPsearchMethod", CLPsearchMethod);
@@ -206,16 +212,37 @@ public class PartitionProblem {
         System.out.println();
 
         for (int i = 0; i < sets; i++) {
-            System.out.print("Proceed to set n." + (i + 1) + "? (Y/N): ");
-
-            if (stdin.next().toLowerCase().startsWith("y"))
+            System.out.print("Proceed to set n." + (i + 1) + "? (Y/N/(s)kip): ");
+            String ans = stdin.next();
+            if (ans.toLowerCase().startsWith("y"))
                 solveSet(file, stdin, i + 1);
+            else if (ans.toLowerCase().startsWith("s"))
+                skipSet(file);
             else
                 break;
 
             System.out.println();
         }
 
+    }
+
+    private static void skipSet(Scanner file) {
+        int r = file.nextInt();
+
+        for (int i = 0; i < r; i++) {
+            file.nextInt();
+            int vn = file.nextInt();
+            for (int j = 0; j < vn; j++) {
+                file.nextInt();
+                file.nextInt();
+            }
+        }
+
+        int cr = file.nextInt();
+
+        for (int i = 0; i < cr; i++) {
+            file.nextInt();
+        }
     }
 
     /**
@@ -248,13 +275,25 @@ public class PartitionProblem {
     }
 
     private static void startSolving(Approach approach, Scanner stdin, int setNumber) {
+        final ExecutorService service = Executors.newSingleThreadExecutor();
+
         try {
-            int answer = approach.solve();
+
+            long startingTime = System.currentTimeMillis();
+
+            Future<Integer> f = service.submit(() -> {
+                return approach.solve();
+            });
+
+            int answer = f.get(Approach.timeout, TimeUnit.SECONDS);
+
+            long elapsedTime = (System.currentTimeMillis() - startingTime) / 1000;
 
             Utils.clearWindow(headerText);
 
             System.out.println("Number of vertexes in solution: " + answer);
             System.out.println("Number of states expanded: " + approach.getStatesExpanded());
+            System.out.println("Elapsed Time: " + elapsedTime + "s");
             System.out.println();
             System.out.print("Do you want to get an output of the vertexes chosen? (Y/N): ");
 
@@ -264,19 +303,32 @@ public class PartitionProblem {
             }
 
         } catch (Exception e) {
+            service.shutdown();
             Utils.logError(e);
-            return;
+        } finally {
+            service.shutdown();
         }
     }
 
     private static void startSolving(CSPApproach approach, Scanner stdin, int setNumber) {
+        final ExecutorService service = Executors.newSingleThreadExecutor();
+
         try {
-            int answer = approach.solve();
+            long startingTime = System.currentTimeMillis();
+
+            Future<Integer> f = service.submit(() -> {
+                return approach.solve();
+            });
+
+            int answer = f.get(Approach.timeout, TimeUnit.SECONDS);
+
+            long elapsedTime = (System.currentTimeMillis() - startingTime) / 1000;
 
             Utils.clearWindow(headerText);
 
             System.out.println("Number of vertexes in solution: " + answer);
             System.out.println("Number of arcs checked: " + approach.getArcsChecked());
+            System.out.println("Elapsed Time: " + elapsedTime + "s");
             System.out.println();
             System.out.print("Do you want to get an output of the vertexes chosen? (Y/N): ");
 
@@ -286,8 +338,10 @@ public class PartitionProblem {
             }
 
         } catch (Exception e) {
+            service.shutdown();
             Utils.logError(e);
-            return;
+        } finally {
+            service.shutdown();
         }
     }
 
@@ -308,14 +362,22 @@ public class PartitionProblem {
             engine.compile(program);
 
             if (selectedApproach == 14) {
-                CompoundTerm term = engine.rpc(String.format("partition_problem(S, %s, %s, %s)", CLPselectionMethod,
-                        CLPchoiceMethod, CLPsearchMethod));
+                long startingTime = System.currentTimeMillis();
+                CompoundTerm term = engine.rpc(String.format("partition_problem(S, %s, %s, %s, BSteps)",
+                        CLPselectionMethod, CLPchoiceMethod, CLPsearchMethod));
                 System.out.println("Chosen Verts: " + term.arg(1));
+                System.out.println("BSteps: " + term.arg(5));
+                long elapsedTime = (System.currentTimeMillis() - startingTime) / 1000;
+                System.out.println("Elapsed Time: " + elapsedTime + "s");
             } else {
-                CompoundTerm term = engine.rpc(String.format("partition_color_problem(C, S, %s, %s, %s)",
+                long startingTime = System.currentTimeMillis();
+                CompoundTerm term = engine.rpc(String.format("partition_color_problem(C, S, %s, %s, %s, BSteps)",
                         CLPselectionMethod, CLPchoiceMethod, CLPsearchMethod));
                 System.out.println("Chosen Verts: " + term.arg(2));
                 System.out.println("Colors: " + term.arg(1));
+                System.out.println("BSteps: " + term.arg(6));
+                long elapsedTime = (System.currentTimeMillis() - startingTime) / 1000;
+                System.out.println("Elapsed Time: " + elapsedTime + "s");
             }
 
         } catch (Exception e) {

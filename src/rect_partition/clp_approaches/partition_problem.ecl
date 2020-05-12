@@ -5,20 +5,17 @@
 
 :- compile("prolog_data.tmp").
 
-partition_problem(S, Selection, Choice, Search) :-
+partition_problem(S, Selection, Choice, Search, BSteps) :-
     generate_vert_list(Verts),
     generate_vars_list(Vars, Verts),
-    Vars #:: 0..1,
-    generate_rectangle_list(GRects),
-    set_rect_constraints(Vars, GRects),
-    set_choose_cost_constraints(Vars, Cost),
-    minimize(search([Cost|Vars], 0, Selection, Choice, Search, []), Cost),
+    set_partition_problem_constraints(Vars, Cost),
+    minimize(search([Cost|Vars], 0, Selection, Choice, Search, [backtrack(BSteps)]), Cost),
     get_chosen_verts(Vars, S).
 
-partition_color_problem(C, S, Selection, Choice, Search) :-
+partition_color_problem(C, S, Selection, Choice, Search, BSteps):-
     generate_vert_list(Verts),
     generate_vars_list(Vars, Verts),
-    partition_problem(S, Selection, Choice, Search),
+    partition_problem(S, Selection, Choice, Search, BSteps1),
     length(S, MaxColor),
     Vars #:: 0..MaxColor,
     length(Verts, NVerts),
@@ -26,11 +23,16 @@ partition_color_problem(C, S, Selection, Choice, Search) :-
     generate_rectangle_list(GRects),
     set_color_constraints(GRects, S, Vars),
     Cost #= sum(Vars),
-    minimize(search([Cost|Vars], 0, Selection, Choice, Search, []), Cost),
+    minimize(search([Cost|Vars], 0, Selection, Choice, Search, [backtrack(BSteps2)]), Cost),
+    BSteps is BSteps1 + BSteps2,
     C = Vars.
 
 
-
+set_partition_problem_constraints(Vars, Cost) :-
+    Vars #:: 0..1,
+    generate_rectangle_list(GRects),
+    set_rect_constraints(Vars, GRects),
+    set_choose_cost_constraints(Vars, Cost).
 
 set_color_constraints([], _, _).
 set_color_constraints([R|T], S, Vars) :-
@@ -89,17 +91,3 @@ get_var([X|_], 1, X) :- !.
 get_var([_|R], I, X) :-
     I1 is I-1,
     get_var(R, I1, X).
-
-test :-
-    generate_vert_list(Verts),
-    generate_vars_list(Vars, Verts),
-    partition_problem(S),
-    write(S),
-    length(S, MaxColor),
-    Vars #:: 0..MaxColor,
-    length(Verts, NVerts),
-    set_color_domain_constraints(NVerts, Vars, S),
-    generate_rectangle_list(GRects),
-    set_color_constraints(GRects, S, Vars),
-    Cost #= sum(Vars),
-    minimize(search([Cost|Vars], 0, input_order, indomain, complete, []), Cost).
